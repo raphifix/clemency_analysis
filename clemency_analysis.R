@@ -6,13 +6,9 @@ library(ggplot2)
 library(rvest)
 library(zoo)
 
-# URL to get table from
-url <- "https://www.justice.gov/pardon/obama-commutations"
-
 # extract table
 clemency_info <- 
-  url %>% 
-  read_html() %>%
+  read_html("https://www.justice.gov/pardon/obama-commutations") %>%
   html_nodes(xpath = "/html/body/div[1]/div[2]/div/div/div[2]/article/div[1]/div/div/div/table[1]") %>% 
   html_table()
 
@@ -37,7 +33,6 @@ clemency_info <- na.locf(clemency_info)
 # Extract offenses
 offenses <- clemency_info$description[which(clemency_info$attribute == 'Offense')]
 offenses <- tolower(offenses)
-
 offenses_vec <- c()
 for(i in 1:length(offenses)){
   offenses_vec <- append(offenses_vec, strsplit(offenses[i], ';')[[1]])

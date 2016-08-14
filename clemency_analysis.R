@@ -21,7 +21,11 @@ clemency_info <- as.data.frame(clemency_info)
 
 # change names
 names(clemency_info) <- c('attribute', 'description')
+
+# make empty attributes NA
 clemency_info$attribute[which(regexpr('[:alnum:]', clemency_info$attribute) == -1)] <- NA
+
+# drop trailing colons
 clemency_info$attribute <- gsub(':', '', clemency_info$attribute)
 
 for(i in 1:nrow(clemency_info)){

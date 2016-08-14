@@ -1,15 +1,25 @@
+# clear the way
 rm(list=ls())
+
+# load libraries
 library(ggplot2)
 library(rvest)
 library(zoo)
 
+# URL to get table from
 url <- "https://www.justice.gov/pardon/obama-commutations"
+
+# extract table
 clemency_info <- 
   url %>% 
   read_html() %>%
   html_nodes(xpath = "/html/body/div[1]/div[2]/div/div/div[2]/article/div[1]/div/div/div/table[1]") %>% 
   html_table()
+
+# convert to df
 clemency_info <- as.data.frame(clemency_info)
+
+# change names
 names(clemency_info) <- c('attribute', 'description')
 clemency_info$attribute[which(regexpr('[:alnum:]', clemency_info$attribute) == -1)] <- NA
 clemency_info$attribute <- gsub(':', '', clemency_info$attribute)

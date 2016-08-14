@@ -28,14 +28,13 @@ clemency_info$attribute[which(regexpr('[:alnum:]', clemency_info$attribute) == -
 # drop trailing colons
 clemency_info$attribute <- gsub(':', '', clemency_info$attribute)
 
-for(i in 1:nrow(clemency_info)){
-  if(is.na(clemency_info[i,1]) & clemency_info[i+1,1] == "Offense"){
-    clemency_info[i,1] <- 'Name'
-  }
-}
+# Names always precede the offense but aren't labeled in the table
+clemency_info$attribute[which(clemency_info[,1] == "Offense") - 1] <- 'Name'
 
+# fill the rest of the NAs with the preceding label
 clemency_info <- na.locf(clemency_info)
 
+# Extract offenses
 offenses <- clemency_info$description[which(clemency_info$attribute == 'Offense')]
 offenses <- tolower(offenses)
 

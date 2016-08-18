@@ -36,6 +36,10 @@ clemency_info$person_indic[which(clemency_info$attribute == 'Name')] <- seq(1:le
 clemency_info <- na.locf(clemency_info)
 clemency_info$person_indic <- as.numeric(clemency_info$person_indic)
 
+# make attributes unique by person
+for(i in 1:length(clemency_info$attribute)){
+  print(clemency_info$attribute[i] == clemency_info$attribute[i-1])
+}
 # Extract offenses
 offenses <- clemency_info$description[which(clemency_info$attribute == 'Offense')]
 offenses <- tolower(offenses)
@@ -80,3 +84,10 @@ ggplot(na.omit(offenses_df), aes(x = drug_involved, fill = drug_involved)) +
        y = 'Percentage of Drug-Related Offenses',
        fill = 'Drug',
        title = 'Types of Drugs Involved in Drug-Related Offenses Among Communited Sentences')
+
+# made dataset more readible
+clemency_info <- 
+  clemency_info %>% 
+  dplyr::group_by(person_indic, attribute) %>% 
+  dplyr::summarise(description=toString(unique(description))) %>% 
+  tidyr::spread(attribute, description)

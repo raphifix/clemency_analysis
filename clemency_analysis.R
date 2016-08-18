@@ -4,6 +4,7 @@ rm(list=ls())
 # load libraries
 library(ggplot2)
 library(rvest)
+library(tidyr)
 library(zoo)
 
 # extract table
@@ -27,8 +28,13 @@ clemency_info$attribute <- gsub(':', '', clemency_info$attribute)
 # Names always precede the offense but aren't labeled in the table
 clemency_info$attribute[which(clemency_info[,1] == "Offense") - 1] <- 'Name'
 
+# Create indicator for person
+clemency_info$person_indic <- NA
+clemency_info$person_indic[which(clemency_info$attribute == 'Name')] <- seq(1:length(which(clemency_info$attribute == 'Name')))
+
 # fill the rest of the NAs with the preceding label
 clemency_info <- na.locf(clemency_info)
+clemency_info$person_indic <- as.numeric(clemency_info$person_indic)
 
 # Extract offenses
 offenses <- clemency_info$description[which(clemency_info$attribute == 'Offense')]

@@ -43,17 +43,8 @@ clemency_info <-
   group_by(person_indic, attribute) %>% 
   summarise(description = toString(unique(description))) %>% 
   spread(attribute, description) %>% 
-  select(-person_ind)
-
-# Extract offenses
-offenses <- clemency_info$description[which(clemency_info$attribute == 'Offense')]
-offenses <- tolower(offenses)
-offenses_vec <- c()
-for(i in 1:length(offenses)){
-  offenses_vec <- append(offenses_vec, strsplit(offenses[i], ';')[[1]])
-}
-offenses <- offenses_vec
-offenses_vec <- NULL
+  ungroup() %>% 
+  select(-person_indic)
 
 drugs_parsed <- 
   read_html("http://drugabuse.com/library/drugs-a-z/") %>% 
@@ -63,11 +54,11 @@ drugs_list <- gsub('drug-', '', unlist(html_attrs(drugs_parsed)))
 drug_related <- c()
 drug_involved <- c()
 firearm_related <- c()
-for(i in 1:length(offenses)){
-  off <- strsplit(gsub('[[:punct:]]', '', offenses[i]), ' ')[[1]]
+for(i in 1:length(clemency_info$Offense)){
+  off <- strsplit(gsub('[[:punct:]]', '', clemency_info$Offense[i]), ' ')[[1]]
   if(!is.na(match(TRUE, drugs_list %in% off)) || !is.na(match(TRUE, 'drug' %in% off))){
     drug_related[i] <- 1
-    drug_involved[i] <- drugs_list[match(TRUE, drugs_list %in% strsplit(gsub('[[:punct:]]', '', offenses[i]), ' ')[[1]])]
+    drug_involved[i] <- drugs_list[match(TRUE, drugs_list %in% strsplit(gsub('[[:punct:]]', '', clemency_info$Offense[i]), ' ')[[1]])]
   }else{
     drug_related[i] <- 0
     drug_involved[i] <- NA
@@ -79,7 +70,7 @@ for(i in 1:length(offenses)){
   }
 }
 
-offenses_df <- data.frame('offense' = offenses, drug_related, drug_involved, firearm_related)
+offenses_df <- data.frame('offense' = clemency_info$Offense, drug_related, drug_involved, firearm_related)
 offenses_df$offense <- as.character(offenses_df$offense)
 
 ggplot(na.omit(offenses_df), aes(x = drug_involved, fill = drug_involved)) +

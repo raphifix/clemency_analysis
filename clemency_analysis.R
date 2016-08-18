@@ -81,3 +81,5 @@ ggplot(na.omit(offenses_df), aes(x = drug_involved, fill = drug_involved)) +
        fill = 'Drug',
        title = 'Types of Drugs Involved in Drug-Related Offenses Among Communited Sentences')
   
+# split on number
+strsplit(clemency_info$`District/Date`,split = '\\,\\s(\\d+)\\.\\s')
